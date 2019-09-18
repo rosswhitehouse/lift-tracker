@@ -1,8 +1,11 @@
 <template>
-  <li class="white-box" @click="selectExercise(exercise.slug)">
+  <li
+    v-bind:class="{ 'white-box': true, complete: exercise.isComplete }"
+    v-on:click="exercise.totalSets > 1 ? $emit('selectExercise', exercise.slug) : $emit('completeSet', exercise.slug)"
+  >
     <h3>{{ exercise.name }}</h3>
-    <span class="area">{{ exercise.area }}</span>
-    <div class="flex">
+    <span class="type">{{ exercise.type }}</span>
+    <div v-if="exercise.type !== 'cardio'" class="flex">
       <div>
         <span>{{ exercise.sets }} x {{ exercise.reps }}</span>
       </div>
@@ -13,29 +16,34 @@
         <span>{{ exercise.weight }}kg</span>
       </div>
     </div>
-    <ul class="sets" v-show="isActiveExercise && !exercise.isCompleted">
+    <div v-if="exercise.type === 'cardio'">{{ exercise.description }}</div>
+    <ul v-else class="sets" v-show="isActiveExercise && !exercise.isComplete">
       <li
         v-for="(set, index) in exercise.sets"
-        v-show="index <= currentSet"
+        v-show="index <= exercise.completedSets"
         v-bind:key="index"
-        v-bind:class="{ completed: index < currentSet}"
+        v-bind:class="{ completed: index < exercise.completedSets}"
       >
         Set {{ index + 1 }}
-        <span v-bind:class="{ circle: true, complete: index < currentSet }"></span>
-      </li>
-      <li v-show="exercise.hasDropSet && !exercise.isCompleted && currentSet >= exercise.sets">
-        DROP SET
         <span
-          v-bind:class="{ circle: true, complete: exercise.isCompleted }"
-          class="circle"
+          v-bind:class="{ circle: true, complete: index < exercise.completedSets }"
         ></span>
+      </li>
+      <li
+        v-show="exercise.hasDropSet && !exercise.isComplete && exercise.completedSets >= exercise.sets"
+      >
+        DROP SET
+        <span v-bind:class="{ circle: true, complete: exercise.isComplete }" class="circle"></span>
       </li>
     </ul>
     <div class="action-wrap">
-      <button v-if="isActiveExercise && !exercise.isCompleted" v-on:click="completeSet">
+      <button
+        v-if="isActiveExercise && !exercise.isComplete"
+        v-on:click="$emit('completeSet', exercise.slug)"
+      >
         <ArrowDownIcon />
       </button>
-      <div v-else-if="exercise.isCompleted" class="complete-message">
+      <div v-else-if="exercise.isComplete" class="complete-message">
         <TickIcon />
       </div>
     </div>
@@ -49,35 +57,22 @@ import WeightIcon from "./icons/WeightIcon";
 export default {
   name: "exercise-list-item",
   components: { ArrowDownIcon, TickIcon, WeightIcon },
-  data: function() {
-    return { currentSet: 0 };
-  },
-  methods: {
-    completeSet: function(e) {
-      this.currentSet = this.currentSet + 1;
-      if (
-        (!this.exercise.hasDropSet && this.currentSet === this.exercise.sets) ||
-        this.currentSet > this.exercise.sets
-      ) {
-        this.completeExercise();
-      }
-    },
-    completeExercise: function() {
-      console.log("complete");
-      this.exercise.isCompleted = true;
-      this.$forceUpdate();
-    }
-  },
   props: {
     exercise: Object,
-    isActiveExercise: Boolean,
-    selectExercise: Function
+    isActiveExercise: Boolean
   }
 };
 </script>
 
 <style>
-.area {
+li.complete {
+  background: white;
+  color: #15d176;
+}
+li.complete svg {
+  fill: #15d176;
+}
+.type {
   float: right;
   font-size: 1.2rem;
   text-transform: uppercase;
@@ -129,9 +124,7 @@ export default {
 .action-wrap .complete-message {
   background: white;
   font-size: 2rem;
-  margin: 1rem 0;
   width: 100%;
   height: 4rem;
-  text-align: center;
 }
 </style>

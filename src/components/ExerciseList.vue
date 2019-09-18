@@ -3,22 +3,13 @@
     <h2>{{ workout.day }}</h2>
     <ul>
       <ExerciseListItem
-        v-for="(exercise) in workout.exercises"
-        v-bind:key="exercise.slug"
-        v-bind:exercise="exercise"
+        v-for="(exercise) in exercises"
+        v-on:completeSet="completeSet"
+        v-on:selectExercise="selectExercise"
+        v-bind:exercise.sync="exercise"
         v-bind:isActiveExercise="exercise.slug === activeExerciseSlug"
-        v-bind:selectExercise="selectExercise"
+        v-bind:key="exercise.slug"
       />
-      <li class="white-box" v-on:click="completeFinisher">
-        <h3>{{ workout.finisher.name }}</h3>
-        <span class="icon">
-          <CardioIcon />
-        </span>
-        <p>{{ workout.finisher.description }}</p>
-        <div v-if="isFinisherComplete" class="complete-message">
-          <TickIcon />
-        </div>
-      </li>
     </ul>
     <button class="back-button">
       <ArrowLeftIcon />BACK
@@ -36,20 +27,41 @@ export default {
   components: { ArrowLeftIcon, CardioIcon, ExerciseListItem, TickIcon },
   data: function() {
     return {
-      activeExerciseSlug: this.workout.exercises[0].slug,
+      activeExerciseSlug: this.exercises[0].slug,
       isFinisherComplete: false
     };
   },
+  beforeUpdate: function() {
+    console.log("before update");
+  },
   methods: {
-    completeFinisher: function() {
-      this.isFinisherComplete = true;
+    completeSet: function(slug) {
+      console.log("complete-set", slug);
+      const exercise = this.getExerciseBySlug(slug);
+      exercise.completedSets++;
+      if (exercise.completedSets === exercise.totalSets) {
+        this.completeExercise(slug);
+      }
+    },
+    completeExercise: function(slug) {
+      this.getExerciseBySlug(slug).isComplete = true;
+      console.log("COMPLETE-exercise", slug);
+    },
+    getExerciseBySlug: function(slug) {
+      return this.exercises.find(exercise => exercise.slug === slug);
     },
     selectExercise: function(selectedSlug) {
       this.activeExerciseSlug = selectedSlug;
     }
   },
   props: {
-    workout: Object
+    workout: Object,
+    exercises: Array
+  },
+  watch: {
+    exercises: function() {
+      console.log("watch fired");
+    }
   }
 };
 </script>
