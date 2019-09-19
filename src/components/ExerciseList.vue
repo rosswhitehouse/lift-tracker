@@ -19,33 +19,26 @@
 
 <script>
 import ArrowLeftIcon from "./icons/ArrowLeftIcon";
-import CardioIcon from "./icons/CardioIcon";
 import ExerciseListItem from "./ExerciseListItem";
-import TickIcon from "./icons/TickIcon";
 export default {
   name: "exercise-list",
-  components: { ArrowLeftIcon, CardioIcon, ExerciseListItem, TickIcon },
+  components: { ArrowLeftIcon, ExerciseListItem },
   data: function() {
     return {
       activeExerciseSlug: this.exercises[0].slug,
       isFinisherComplete: false
     };
   },
-  beforeUpdate: function() {
-    console.log("before update");
-  },
   methods: {
     completeSet: function(slug) {
-      console.log("complete-set", slug);
       const exercise = this.getExerciseBySlug(slug);
-      exercise.completedSets++;
+      this.$set(exercise, "completedSets", exercise.completedSets + 1);
       if (exercise.completedSets === exercise.totalSets) {
         this.completeExercise(slug);
       }
     },
     completeExercise: function(slug) {
       this.getExerciseBySlug(slug).isComplete = true;
-      console.log("COMPLETE-exercise", slug);
     },
     getExerciseBySlug: function(slug) {
       return this.exercises.find(exercise => exercise.slug === slug);
@@ -57,11 +50,6 @@ export default {
   props: {
     workout: Object,
     exercises: Array
-  },
-  watch: {
-    exercises: function() {
-      console.log("watch fired");
-    }
   }
 };
 </script>

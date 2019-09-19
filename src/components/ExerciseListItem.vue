@@ -3,7 +3,7 @@
     v-bind:class="{ 'white-box': true, complete: exercise.isComplete }"
     v-on:click="exercise.totalSets > 1 ? $emit('selectExercise', exercise.slug) : $emit('completeSet', exercise.slug)"
   >
-    <h3>{{ exercise.name }}</h3>
+    <h3>{{ exercise.name }}, {{ exercise.completedSets }}</h3>
     <span class="type">{{ exercise.type }}</span>
     <div v-if="exercise.type !== 'cardio'" class="flex">
       <div>

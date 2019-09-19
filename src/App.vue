@@ -9,7 +9,6 @@
 
 <script>
 import Header from "./components/Header.vue";
-import * as api from "./utils/api.js";
 import "./styles/reset.css";
 
 export default {
