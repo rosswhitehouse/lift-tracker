@@ -32,10 +32,13 @@ export default {
   methods: {
     completeSet: function(slug) {
       const exercise = this.getExerciseBySlug(slug);
-      this.$set(exercise, "completedSets", exercise.completedSets + 1);
-      if (exercise.completedSets === exercise.totalSets) {
-        this.completeExercise(slug);
-      }
+      const exerciseIndex = this.exercises.indexOf(exercise);
+      const newExercise = {
+        ...this.exercises[exerciseIndex],
+        completedSets: this.exercises[exerciseIndex].completedSets + 1
+      };
+      this.$set(this.exercises, exerciseIndex, newExercise);
+      this.$forceUpdate();
     },
     completeExercise: function(slug) {
       this.getExerciseBySlug(slug).isComplete = true;
