@@ -3,6 +3,7 @@ import VueRouter from 'vue-router'
 import App from './App.vue'
 
 Vue.use(VueRouter)
+Vue.config.devtools = true
 
 import WorkoutList from './components/WorkoutList.vue'
 import ExerciseList from './components/ExerciseList.vue'
